@@ -1,0 +1,224 @@
+---
+title: "analyze_relax_results"
+author: "Hannah K. Pare"
+date: "2024-07-23"
+output: html_document
+
+"This script analyzes the results of the RELAX analysis to test for relaxed or intensified selection pressure along a specific set of branches in a gene tree. It has five sections
+  1. input user information (i.e. the path to your current working directory)
+  2. merge the relax results with the functional gene classification data
+  3. compile and reformat the data for visualization and user readability
+  4. plot the data
+  5. fisher's test for enrichment of functional classification among genes with intensified or relaxed selection pressure
+  
+The sections can be run independently as long as the above section has been successfully completed previously" 
+---
+
+# input user information
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# set the working directory which should contain the gene_cats_simple.csv and relaxed_intensified_genes.csv files
+pwd <- ""
+setwd(pwd)
+```
+
+# add gene category information to RELAX results
+
+```{r}
+gene_dat <- as.data.frame(read.csv("*gene_cats_simple.csv"))
+relax_dat <- as.data.frame(read.csv("*relaxed_intensified_genes.csv"))
+
+# subset relax results by char scheme (1, 2 or 3) and selection intensity (Relaxed (R) or Intensified (I))
+char1_I <- relax_dat[,1:2]
+char2_I <- relax_dat[,3:4]
+char3_I <- relax_dat[,5:6]
+char1_R <- relax_dat[,7:8]
+char2_R <- relax_dat[,9:10]
+char3_R <- relax_dat[,11:12]
+
+# merge all of the data by gene name
+merge1 <- merge(gene_dat, char1_I, by.x = "Gene", by.y = "Char.1.intensified", all.x = TRUE)
+merge2 <- merge(merge1, char2_I, by.x = "Gene", by.y = "Char.2.Intensified", all.x = TRUE)
+merge3 <- merge(merge2, char3_I, by.x = "Gene", by.y = "Char.3.intensified", all.x = TRUE)
+merge4 <- merge(merge3, char1_R, by.x = "Gene", by.y = "Char.1.Relaxed", all.x = TRUE)
+merge5 <- merge(merge4, char2_R, by.x = "Gene", by.y = "Char.2.Relaxed", all.x = TRUE)
+merge_final <- merge(merge5, char3_R, by.x = "Gene", by.y = "Char.3.Relaxed", all.x = TRUE)
+
+# The output file contains the functional classification for each gene as well as information as to whether or not the test branches experienced relaxed or intensified selection pressure under each character scheme (1 = yes, NA = no)
+write.csv(merge_final, file = paste(pwd, "merged_relax.csv", sep = "/"), row.names = F)
+
+# unload unnecessary data
+rm(char1_I, char1_R, char2_I, char2_R, char3_I, char3_R, merge1, merge2, merge3, merge4, merge5, gene_dat)
+```
+
+# compile and reformat data as the percentage of intensified or relaxed genes in each functional class according to the three character schemes
+
+```{r}
+merge_final <- read.csv(paste(pwd, "merged_relax.csv", sep = "/"))
+relax_dat_formatted <- as.data.frame(matrix(nrow = 81, ncol = 5))
+colnames(relax_dat_formatted) <- c("Class", "Char_Scheme", "Selection", "Number", "Percent")
+
+# store a list of the 9 functional classes
+func_classes <- sort(unique(merge_final$Class))
+
+# get the total number of genes with each functional classification
+total_in_func_class <- list()
+for (num in 1:length(func_classes)){
+  total <- length(subset(merge_final$Class, merge_final$Class == func_classes[num]))
+  total_in_func_class[[length(total_in_func_class) + 1]] <- total
+}
+names(total_in_func_class) <- func_classes
+
+# get the percentage of all genes assigned to each functional class
+percent_in_func_class <- lapply(total_in_func_class, function(x) {(x/length(merge_final$Class))*100})
+
+# add the totals to the data frame
+# to enable easy comparison with the intensified and relaxed genes, make "all" its own selection category in each of the three char. schemes
+start <- 1
+for (scheme in 1:3) {
+  end <- start + 8
+  data <- cbind(names(total_in_func_class), rep(scheme, 9), rep("All", 9), unlist(total_in_func_class), unlist(percent_in_func_class))
+  relax_dat_formatted[start:end, 1:5] <- data
+  start <- start + 9
+}
+
+# get the number of genes with intensified or relaxed selection pressure in each functional class according to each char. scheme
+# function takes the scheme number (integer from 1 - 3) and the selection type (character; either Intensified or Relaxed)
+# returns a list of 2 items, the first is a list of the number of genes in each class with the specified selection type in the scheme number and the second is a list of the the values as a percentage of the total number of genes
+calc_percent <- function(scheme, selection){
+  # determine which column to pull data from based on the selected scheme and selection type
+  if (scheme == 1 && selection == "Intensified") {
+    column <- 3
+  } else if (scheme == 2 && selection == "Intensified") {
+    column <- 4
+  } else if (scheme == 3 && selection == "Intensified") {
+    column <- 5
+  } else if (scheme == 1 && selection == "Relaxed") {
+    column <- 6
+  } else if (scheme == 2 && selection == "Relaxed") {
+    column <- 7
+  } else if (scheme == 3 && selection == "Relaxed") {
+    column <- 8
+  } else {
+    print("Error: incorrect input variables: scheme can be either 1, 2 or 3 and selection can be either Intensified or Relaxed")
+  }
+  # store the number of genes in each functional class with intensified or relaxed selection pressure in a named list
+  numbers <- list()
+  for (num in 1: length(func_classes)) {
+    tmp <- subset(merge_final, merge_final$Class == func_classes[[num]])
+    num <- sum(tmp[,column][!(is.na(tmp[,column]))])
+    numbers[length(numbers) + 1] <- num
+  }
+  names(numbers) <- func_classes
+  # total number of intensified or relaxed genes across all classes
+  total_in_cat <- sum(unlist(numbers))
+  # list of the percentages of intensified or relaxed genes in each class 
+  percents <- lapply(numbers, function(x) {(x/total_in_cat)*100})
+  
+  return(list(numbers, percents))
+}
+
+# populate the rest of the formatted data frame
+for (scheme2 in 1:3) {
+  for (selection in c("Intensified", "Relaxed")){
+    tmp_dat <- calc_percent(scheme2, selection)
+    end <- start + 8
+    data <- cbind(names(total_in_func_class), rep(scheme2, 9), rep(selection, 9), unlist(tmp_dat[[1]]), unlist(tmp_dat[[2]]))
+    relax_dat_formatted[start:end, 1:5] <- data
+    start <- start + 9
+  }
+}
+
+# save the data in a csv file
+write.csv(relax_dat_formatted, file = paste(pwd, "formatted_relax.csv", sep = "/"), row.names = F)
+
+# unload unnecessary data
+rm(data, percent_in_func_class, tmp_dat, total_in_func_class, end, num, scheme, scheme2, selection, start, total)
+```
+
+# plot the data
+
+```{r}
+library(ggplot2)
+library(colorspace)
+
+plot_dat <- as.data.frame(read.csv(paste(pwd, "formatted_relax.csv", sep = "/")))
+plot_dat$Class <- as.factor(plot_dat$Class)
+plot_dat$Char_Scheme <- as.factor(plot_dat$Char_Scheme)
+plot_dat$Selection <- as.factor(plot_dat$Selection)
+
+# plot the number of genes in class
+p <- ggplot(plot_dat, aes(x = Selection, y = Number)) + 
+  geom_col(aes(fill = Class), width = 0.7) +
+  scale_fill_discrete_qualitative(palette = "Dark 3") +
+  facet_wrap(~Char_Scheme) +
+  coord_flip() +
+  ylab("Number of genes in functional class") +
+  xlab("") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+p
+
+pdf(paste(pwd, "num_genes.pdf", sep = "/"), width = 12, height = 7)
+plot(p)
+dev.off()
+
+# plot the percent of genes in class
+p2 <- ggplot(plot_dat, aes(x = Selection, y = Percent)) + 
+  geom_col(aes(fill = Class), width = 0.7) +
+  scale_fill_discrete_qualitative(palette = "Dark 3") +
+  facet_wrap(~Char_Scheme) +
+  ylab("Percentage of genes in functional class") +
+  xlab("") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+p2
+
+pdf(paste(pwd, "percent_genes.pdf", sep = "/"), width = 12, height = 10)
+plot(p2)
+dev.off()
+```
+
+# Fisher's test for enrichment of certain functional classes among genes with intensified or relaxed selection pressure
+
+```{r}
+dat <- as.data.frame(read.csv(paste(pwd, "formatted_relax.csv", sep = "/")))
+
+# function takes the character scheme number (integer from 1 - 3), the selection type (character; Intensified or Relaxed) and the functional class
+# returns a list of two items, the first is the p-value and the second is the odds ratio
+fish_test <- function(scheme, selection, class){
+  sub_dat <- dat[dat$Char_Scheme == scheme,]
+  selection_class <- sub_dat$Number[sub_dat$Class == class & sub_dat$Selection == selection]
+  not_selection_class <- sub_dat$Number[sub_dat$Class == class & sub_dat$Selection == "All"] - selection_class
+  selection_not_class <- sum(sub_dat$Number[sub_dat$Selection == selection]) - selection_class
+  not_selection_not_class <- sum(sub_dat$Number[sub_dat$Selection == "All"]) - (selection_class + not_selection_class + selection_not_class)
+  class_vs_selection <- data.frame(c(selection_class, selection_not_class), c(not_selection_class, not_selection_not_class))
+  result <- fisher.test(class_vs_selection)
+  p_val <- result$p.value
+  odds <- result$estimate[["odds ratio"]]
+  
+  return(list(p_val, odds))
+}
+
+# store the results of the fisher's test
+fish_dat <- as.data.frame(matrix(ncol = 5, nrow = 0))
+colnames(fish_dat) <- c("Class", "Selection", "Char_Scheme", "p-val", "odds_ratio")
+
+# store a list of the 9 functional classes
+func_classes <- sort(unique(dat$Class))
+
+for (class in func_classes){
+  for (selection in c("Intensified", "Relaxed")) {
+    for (scheme in 1:3) {
+      test <- fish_test(scheme, selection, class)
+      row <- c(class, selection, scheme, test[[1]], test[[2]])
+      fish_dat[nrow(fish_dat) + 1,] <- row
+    }
+  }
+}
+
+# save the data in a csv file
+write.csv(fish_dat, file = paste(pwd, "fishers_results.csv", sep = "/"), row.names = F)
+```
+

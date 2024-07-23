@@ -1,0 +1,146 @@
+﻿Gene,Class
+ALCAM,eye development
+BHLHE23,eye development
+CRB1,eye development
+EPAS1,eye development
+EPHB2,eye development
+ISL1,eye development
+NAV2,eye development
+NR2E1,eye development
+NRP1,eye development
+NRP2,eye development
+NTRK2,eye development
+PHOX2B,eye development
+PLXNA4,eye development
+PRPH2,eye development
+RARB,eye development
+REEP6,eye development
+RORB,eye development
+RP1_1,eye development
+RP1_2,eye development
+RS1,eye development
+SALL1,eye development
+SEMA3A,eye development
+SEMA3F,eye development
+SIX4,eye development
+TFAP2A,eye development
+ATP8A2,misc
+ATP8B1,misc
+BBS4,misc
+BCL2A1,misc
+BIRC7,misc
+CCDC66,misc
+CLEC2B,misc
+CLN5,misc
+CLN6,misc
+CLN8,misc
+DNAJC19,misc
+EYS,misc
+GZMK,misc
+HSD11B1L,misc
+LACTBL1,misc
+LBHD1,misc
+LRIT2,misc
+MAGEB1,misc
+MYO5A,misc
+MYO7A,misc
+NOB1,misc
+NYX,misc
+OPA1,misc
+OPTN,misc
+PCDH15,misc
+PDCL,misc
+PDE5A,misc
+PKD1L2,misc
+PPT1,misc
+RPGR,misc
+RSKR,misc
+SAPCD1,misc
+SERPINE3,misc
+SLITRK6,misc
+SPAG6,misc
+STX10,misc
+THY1,misc
+TMEM126A,misc
+TSACC,misc
+TULP1,misc
+VSX1,misc
+WFS1,misc
+ZNF214,misc
+ZNF529,misc
+OPN3,non-visual opsin
+OPN5,non-visual opsin
+RGR,non-visual opsin
+RRH,non-visual opsin
+CALM1,Phototransduction
+CALM2,Phototransduction
+CALM3,Phototransduction
+CALML3,Phototransduction
+CALML4,Phototransduction
+CALML5,Phototransduction
+CALML6,Phototransduction
+CNGA1,Phototransduction
+CNGB1,Phototransduction
+GNB5,Phototransduction
+GUCA1A,Phototransduction
+GUCA1ANB,Phototransduction
+GUCA1B,Phototransduction
+GUCY2D,Phototransduction
+GUCY2F,Phototransduction
+RCVRN,Phototransduction
+RGS9,Phototransduction
+RGS9BP,Phototransduction
+ARR3,Phototransduction: cones
+CNGA3,Phototransduction: cones
+CNGB3,Phototransduction: cones
+EFHD1,Phototransduction: cones
+GNAT2,Phototransduction: cones
+GNB3,Phototransduction: cones
+GNGT2,Phototransduction: cones
+GRK7,Phototransduction: cones
+GUCA1C,Phototransduction: cones
+PDE6C,Phototransduction: cones
+PDE6H,Phototransduction: cones
+SLC24A2,Phototransduction: cones
+ZSWIM7,Phototransduction: cones
+GNAT1,Phototransduction: rods
+GNB1,Phototransduction: rods
+GNGT1,Phototransduction: rods
+GRK1,Phototransduction: rods
+PDE6A,Phototransduction: rods
+PDE6B,Phototransduction: rods
+PDE6D,Phototransduction: rods
+PDE6G,Phototransduction: rods
+RHO,Phototransduction: rods
+SAG,Phototransduction: rods
+SLC24A1,Phototransduction: rods
+ABCA4,retinoid cycle/visual cycle
+CRABP1,retinoid cycle/visual cycle
+RBP4,retinoid cycle/visual cycle
+RDH10,retinoid cycle/visual cycle
+RDH8,retinoid cycle/visual cycle
+RPE65,retinoid cycle/visual cycle
+COL11A1,structure of eye
+CRYBA1,structure of eye
+CRYBA4,structure of eye
+CRYBB3,structure of eye
+CRYGS,structure of eye
+DMD,structure of eye
+GRIFIN,structure of eye
+KRT12,structure of eye
+LAMC3,structure of eye
+LUM,structure of eye
+OPTC,structure of eye
+BEST1,visual signal transduction
+CACNA2D4,visual signal transduction
+CACNB2,visual signal transduction
+CACNB4,visual signal transduction
+GABRR2,visual signal transduction
+GJA10,visual signal transduction
+GJD2,visual signal transduction
+GLRA1,visual signal transduction
+GLRB,visual signal transduction
+HCN1,visual signal transduction
+KCNA2,visual signal transduction
+SLC1A3,visual signal transduction
+TRPM1,visual signal transduction
