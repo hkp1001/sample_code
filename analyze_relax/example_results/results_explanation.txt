@@ -1,0 +1,5 @@
+Note on the relax_results_03.csv file: 
+
+The RELAX analysis takes an alignment and a gene tree with a subset of labeled "test" branches (examples in "all_labeled" directory) and tests whether the "test" branches have experienced a significant relaxation or intensification of selection pressure. The p-value explains whether the test was significant and the K parameter signifies either intensification (K > 1) or relaxation (K < 1). 
+
+The data from this file were simplified to only include significant results in the *relaxed_intensified_genes.csv file used as input for the R script.
