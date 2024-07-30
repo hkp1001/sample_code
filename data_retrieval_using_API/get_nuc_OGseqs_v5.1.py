@@ -36,40 +36,6 @@ def main():
         get_nuc_seqs(OG_file.path, args.email)
         print()
 
-# function takes a list of refseq protein accession numbers and the user's email
-# returns a dictionary with an entry for each protein accession (key) and its corresponding nucleotide accession number (value)
-def get_accessions(prot_list, email):
-    # regular expression matches the line in the protein entry with the refseq nucleotide accession
-    regex = "^DBSOURCE    REFSEQ: accession ([A-Z]{2}_[0-9]+\.[0-9]{1})$"
-    accession_dict = {}
-
-    Bio.Entrez.email = email
-
-    # query the NCBI protein database for each protein accession number
-    for prot in prot_list:
-        # pause between each query in order to not overwhelm the server
-        time.sleep(0.5)
-        handle = Bio.Entrez.esearch(db="Protein", term=prot)
-        results = Bio.Entrez.read(handle)
-        handle.close()
-
-        # check to see that the search resulted in at least one record
-        if int(results["Count"]) > 0:
-            handle = Bio.Entrez.efetch(db="Protein", id=results["IdList"][0], rettype = "gb", retmode = "text")
-            text_data = handle.read()
-            handle.close()
-            lines = text_data.split("\n")
-            for line in lines:
-                match = re.search(regex, line)
-                # identify the line with the nucleotide accession
-                if match:
-                    accession_dict[prot] = match.group(1)
-        # check to see if a match was found for each protein accession. If no match was found, print a warning
-        if not prot in accession_dict:
-            print("Could not find a match for {0}, possibly a format issue with the NCBI entry".format(prot))
-
-    return accession_dict
-
 # function takes the path (a string) to one of the OrthoGroup sequence fasta files and the user's email
 # function will write a fasta file containing the corresponding nucleotide sequences
 def get_nuc_seqs(prot_file_path, email):
@@ -139,6 +105,40 @@ def get_nuc_seqs(prot_file_path, email):
     except RuntimeError as rterr:
         print("RuntimeError: {0} \n Seq: {1}".format(rterr, prot_acc))
         pass
+
+# function takes a list of refseq protein accession numbers and the user's email
+# returns a dictionary with an entry for each protein accession (key) and its corresponding nucleotide accession number (value)
+def get_accessions(prot_list, email):
+    # regular expression matches the line in the protein entry with the refseq nucleotide accession
+    regex = "^DBSOURCE    REFSEQ: accession ([A-Z]{2}_[0-9]+\.[0-9]{1})$"
+    accession_dict = {}
+
+    Bio.Entrez.email = email
+
+    # query the NCBI protein database for each protein accession number
+    for prot in prot_list:
+        # pause between each query in order to not overwhelm the server
+        time.sleep(0.5)
+        handle = Bio.Entrez.esearch(db="Protein", term=prot)
+        results = Bio.Entrez.read(handle)
+        handle.close()
+
+        # check to see that the search resulted in at least one record
+        if int(results["Count"]) > 0:
+            handle = Bio.Entrez.efetch(db="Protein", id=results["IdList"][0], rettype = "gb", retmode = "text")
+            text_data = handle.read()
+            handle.close()
+            lines = text_data.split("\n")
+            for line in lines:
+                match = re.search(regex, line)
+                # identify the line with the nucleotide accession
+                if match:
+                    accession_dict[prot] = match.group(1)
+        # check to see if a match was found for each protein accession. If no match was found, print a warning
+        if not prot in accession_dict:
+            print("Could not find a match for {0}, possibly a format issue with the NCBI entry".format(prot))
+
+    return accession_dict
 
 if __name__ == "__main__":
     main()
