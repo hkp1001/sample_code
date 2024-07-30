@@ -8,10 +8,8 @@
 
 module purge
 module load anaconda/colsa
-#conda activate hyphy-2.5.26
 conda activate hyphy-2.5.59
 
-for x in /mnt/lz01/plachetzki/hkp1001/chapter2/concatenated_files/all_labeled/*.fa; \
+for x in input_files/*.fa; \
 do hyphy relax --alignment ${x} --test Foreground;
 done
-
