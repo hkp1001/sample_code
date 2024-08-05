@@ -19,15 +19,18 @@ lines = []
 
 # grab the json output files from the directory
 for file in os.scandir(args.i):
+    
     # grab info from file name
     # gene name defined as everything before the first "_" in the file name
     gene = file.name.split("_")[0]
+    
     # fix for file name issue with RP1 genes
     if not gene == "RP1":
         char = file.name.split("_")[4][4]
     else:
         gene = file.name.split("_")[0] + "_" + file.name.split("_")[1]
         char = file.name.split("_")[5][4]
+    
     # read in and grab info from json result file
     try:
         with open (file.path, "r") as in_json:
@@ -36,7 +39,7 @@ for file in os.scandir(args.i):
             pval = result_json["test results"]["p-value"]
             K = result_json["test results"]["relaxation or intensification parameter"]
     except IOError as err:
-        print("Error reading json file {0}: {1}".format(file.path, err))
+        print(f"Error reading json file {file.path}: {err}")
     line = [gene, char, LRT, pval, K]
     lines.append(line)
 
