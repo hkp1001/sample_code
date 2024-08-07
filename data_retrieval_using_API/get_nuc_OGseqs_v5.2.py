@@ -4,16 +4,6 @@ __author__ = "Hannah K. Pare"
 __email__ = "Hannah.Pare@unh.edu"
 __version__ = "5.2"
 
-"""
-This script reads in OrthoGroup protein sequence fasta files from a directory and uses the accession numbers to query the Entrez
-database for the nucleotide sequence which codes for the protein. The input sequences should be from the NCBI RefSeq database.
-It takes a path (string) to the directory containing the fasta files and the user's email address for NCBI to contact in case
-of problems with the Entrez server. For each input fasta the script will output a fasta file with the corresponding nucleotide
-sequences and a json file with corresponding protein and nucleotide accession numbers. If the json file has previously been
-created the script will read in the json file in order to avoid needing to re-create the dictionary.
-The user should make sure the json file is in the working directory.
-"""
-
 import argparse
 import Bio.Entrez
 import re
@@ -23,9 +13,17 @@ import os
 import json
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--OGseqs", type=str, required=True, help="Absolute path to the directory containing fasta files for the OrthoGroups of interest")
-    parser.add_argument("--email", type=str, required=True, help="Email address to receive any problems from NCBI")
+    parser = argparse.ArgumentParser(description = """This script reads in protein sequence fasta 
+    files from a directory and uses the accession numbers to query the Entrez database for the nucleotide 
+    sequences which code for the proteins. The input sequences should be from the NCBI RefSeq database. 
+    It takes a path (string) to the directory containing the fasta files and the user's email address for 
+    NCBI to contact in case of problems with the Entrez server. For each input fasta the script will output 
+    a fasta file with the corresponding nucleotide sequences and a json file with corresponding protein and 
+    nucleotide accession numbers. If the json file has previously been created the script will read in the 
+    json file in order to avoid needing to re-create the dictionary. The user should make sure the json file 
+    is in the working directory""")
+    parser.add_argument("--seqs", "-s", type=str, required=True, help="Path to the directory containing protein sequence fasta files")
+    parser.add_argument("--email", "-e", type=str, required=True, help="Email address to receive any problems from NCBI")
     args=parser.parse_args()
 
     # For each input file, write a file containing the nucleotide sequences encoding each protein sequence
