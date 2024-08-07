@@ -4,14 +4,6 @@ __author__ = "Hannah K. Pare"
 __email__ = "hannah.pare11@gmail.com"
 __version__ = "3.0"
 
-"""
-This script condenses fasta files to include just one sequence per unique entry in the file (e.g. one sequence
-per species, one sequence per sample, etc.). Each unique entry should have the same identifier in the sequence 
-headers (anything before the first "_"). It writes two output files for each input file. One output file will 
-contain the longest sequences for each unique entry and the other output file will contain the sequences closest 
-to the median sequence length among all sequences in the file for each unique entry. 
-"""
-
 import argparse
 import string
 import Bio.SeqIO
@@ -22,7 +14,12 @@ def main():
     seq per group (seq with length closest to median and longest seq per entry)"""
 
     # script takes the path (string) to a directory containing the fasta files to be condensed
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description= """This script condenses fasta files to include just one 
+    sequence per unique entry in the file (e.g. one sequence per species, one sequence per sample, etc.). Each 
+    unique entry should have the same identifier in the sequence headers (anything before the first "_"). It 
+    writes two output files for each input file. One output file will contain the longest sequences for each 
+    unique entry and the other output file will contain the sequences closest to the median sequence length among
+    all sequences in the file for each unique entry.""")
     parser.add_argument("-d", type=str, required=True, help="Directory containing fasta files to be condensed")
     args=parser.parse_args()
 
